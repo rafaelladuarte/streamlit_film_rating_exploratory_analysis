@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -40,7 +41,31 @@ class Imbd():
         st.pyplot(fig)
 
     def plot_movie_decade_imbd(self):
-        pass
+        rc = {'figure.figsize':(8,4.5),
+          'axes.labelcolor': 'white',
+          'text.color': '#0e1117',
+          'font.size' : 10,
+          'axes.labelsize': 12,
+          'ytick.labelsize': 12}
+        plt.rcParams.update(rc)
+        year = self.df_imbd["year"].dropna()
+        decada = year.astype('str').split(pat="",expand = True)
+        decada["decada"] = decada[1] + decada[2] + decada[3] + '0'
+        df_imbd_year = pd.merge(year, decada["decada"], right_index= True, left_index= True)
+        df_imbd_year = df_imbd_year.astype(str).astype(int)
+        df_imbd_year = df_imbd_year[df_imbd_year["year"] > 1970]
+        df_imbd_year = df_imbd_year[df_imbd_year["year"] < 2018]
+        df_imbd_year["year"].value_counts().to_frame().reset_index()
+        df_imbd_decada = df_imbd_year["decada"].value_counts().to_frame().reset_index()
+        df_imbd_decada = df_imbd_decada.rename(columns={"index":"decada","decada":"count"})
+        fig, ax = plt.subplots()
+        ax = sns.barplot(
+            x=df_imbd_decada["decada"], 
+            y=df_imbd_decada["count"], 
+            data=df_imbd_decada,
+            color="salmon",
+        )
+        st.pyplot(fig)
 
     def plot_movie_rating_imbd(self):
         pass

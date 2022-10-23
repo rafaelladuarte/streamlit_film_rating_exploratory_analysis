@@ -40,7 +40,31 @@ class Tmbd():
         st.pyplot(fig)
         
     def plot_movie_decade_tmbd(self):
-        pass
+        rc = {'figure.figsize':(8,4.5),
+          'axes.labelcolor': 'white',
+          'text.color': '#0e1117',
+          'font.size' : 10,
+          'axes.labelsize': 12,
+          'ytick.labelsize': 12}
+        plt.rcParams.update(rc)
+        year = self.df_tmbd["year"].dropna()
+        decada = year.str.split(pat="",expand = True)
+        decada["decada"] = decada[1] + decada[2] + decada[3] + '0'
+        df_tmbd_year = pd.merge(year, decada["decada"], right_index= True, left_index= True)
+        df_tmbd_year = df_tmbd_year.astype(str).astype(int)
+        df_tmbd_year = df_tmbd_year[df_tmbd_year["year"] > 1970]
+        df_tmbd_year = df_tmbd_year[df_tmbd_year["year"] < 2018]
+        df_tmbd_year["year"].value_counts().to_frame().reset_index()
+        df_tmbd_decada = df_tmbd_year["decada"].value_counts().to_frame().reset_index()
+        df_tmbd_decada = df_tmbd_decada.rename(columns={"index":"decada","decada":"count"})
+        fig, ax = plt.subplots()
+        ax = sns.barplot(
+            x=df_tmbd_decada["decada"], 
+            y=df_tmbd_decada["count"], 
+            data=df_tmbd_decada,
+            color="seagreen"
+        )
+        st.pyplot(fig)
 
     def plot_movie_company_tmbd(self):
         pass
